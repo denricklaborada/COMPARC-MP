@@ -1,4 +1,5 @@
 {% load filterarrays %}
+{% load mathfilters %}
 
 <!doctype html>
 <html lang="en">
@@ -43,7 +44,7 @@
             <td width=40% style="background:#fff; padding:1%;">Please enter codes here
                 <form method="POST">
                   {% csrf_token %}
-                  <div class="float-right"><button type="submit" class="btn btn-light btn-sm">Run ▶</button></div><br><br>
+                  <div class="float-right"><button type="submit" class="btn btn-light btn-sm">Load ▶</button></div><br><br>
                   <textarea rows="25" cols="78" name="commands" style="resize:none;">{% for cmd in cmdarr %}{{ cmd }}&#13;&#10;{% endfor %}</textarea>
                 </form>
             </td>
@@ -51,7 +52,7 @@
               <table class="table">
                 <thead>
                   <tr>
-                    <th scope="col">#</th>
+                    <th scope="col">Address</th>
                     <th scope="col">Command</th>
                     <th scope="col">Hex</th>
                     <th scope="col">Binary</th>
@@ -60,7 +61,7 @@
                 <tbody>
                   {% for cmd in cmdarr %}
                   <tr>
-                    <th scope="row">{{forloop.counter0}}</th>
+                    <th scope="row">{{forloop.counter0|mul:4}}</th>
                     <td>{{ cmd }}</td>
                     <td>{{ hexoutput|index:forloop.counter0 }}</td>
                     <td>{{ output|index:forloop.counter0 }}</td>
