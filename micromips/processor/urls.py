@@ -6,4 +6,6 @@ app_name = 'processor'
 urlpatterns = [
 
 	url(r'^$', views.index, name='index'),
+	url(r'^initialize/$', views.initialize, name='initialize'),
+	url(r'^reginput/$', views.regInput, name='regInput'),
 ]
