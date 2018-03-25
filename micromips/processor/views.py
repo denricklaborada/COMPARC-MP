@@ -17,9 +17,12 @@ def index(request):
 			for command in cmdarr:
 				cmd = str(command.split(" ", 1)[0])
 				var1 = str(re.split(', ', command.split(" ", 1)[1])[0].split("R", 1)[1])
+				if int(var1) < 0 or int(var1) > 31:
+					error = "Register out of bound"
 
 				if cmd == "LD" or cmd == "SD":
 					var2 = str(re.split(', |\(|\)', command.split(" ", 1)[1])[1])
+
 				else:
 					var2 = str(re.split(', ', command.split(" ", 1)[1])[1].split("R", 1)[1])
 
@@ -56,6 +59,7 @@ def index(request):
 
 			context = {
 				'progObjects': progObjects,
+				'error': error,
 			}
 			return render(request, 'processor/index.html', context)
 			
