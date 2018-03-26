@@ -18,7 +18,7 @@ def index(request):
 				cmd = str(command.split(" ", 1)[0])
 				var1 = str(re.split(', ', command.split(" ", 1)[1])[0].split("R", 1)[1])
 				if int(var1) < 0 or int(var1) > 31:
-					error = "Register out of bound"
+					error = 1
 
 				if cmd == "LD" or cmd == "SD":
 					var2 = str(re.split(', |\(|\)', command.split(" ", 1)[1])[1])
