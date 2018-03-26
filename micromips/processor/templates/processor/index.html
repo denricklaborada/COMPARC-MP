@@ -44,10 +44,12 @@
                 <form method="POST">
                   {% csrf_token %}
                   <div class="float-right"><button type="submit" class="btn btn-light btn-sm">Load ▶</button></div><br><br>
-                  <textarea rows="25" cols="78" name="commands" style="resize:none;">{% for prog in progObjects %}{{ prog.instruction }}&#13;&#10;{% endfor %}</textarea>
                     {% if error %}
-                      <script>alert("{{ error }}")</script>
+                      <div class="alert alert-danger" role="alert">
+                        ERROR! Register out of bound
+                      </div>
                     {% endif %}
+                  <textarea rows="25" cols="78" name="commands" style="resize:none;">{% for prog in progObjects %}{{ prog.instruction }}&#13;&#10;{% endfor %}</textarea>
                 </form>
             </td>
             <td width=60% style="background:#272f45;color:#fff;padding:1%;">
