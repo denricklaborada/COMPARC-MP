@@ -62,9 +62,11 @@
                 <tbody>
                   {% for prog in progObjects %}
                   <tr>
+                    {% if not error %}
                     <th scope="row">{{ prog.addr }}</th>
                     <td>{{ prog.instruction }}</td>
                     <td>{{ prog.opcode }}</td>
+                    {% endif %}
                   </tr>
                   {% endfor %}
                 </tbody>
