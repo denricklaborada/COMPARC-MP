@@ -5,30 +5,33 @@ from .models import Register, DataSegment, MipsProgram
 
 def index(request):
 	progObjects = MipsProgram.objects.all()
+	error = False
 
 	if request.method == 'POST':
+		
+		MipsProgram.objects.all().delete()
+
 		try:
 			commands = request.POST['commands']
 			cmdarr = commands.splitlines()
 			output = []
 			hexoutput = []
 			i = 0
-			MipsProgram.objects.all().delete()
+
 			for command in cmdarr:
 				cmd = str(command.split(" ", 1)[0])
 				var1 = str(re.split(', ', command.split(" ", 1)[1])[0].split("R", 1)[1])
 				if int(var1) < 0 or int(var1) > 31:
-					error = 1
+					error = True
+					MipsProgram.objects.all().delete()
+					break;
 
 				if cmd == "LD" or cmd == "SD":
 					var2 = str(re.split(', |\(|\)', command.split(" ", 1)[1])[1])
+					var3 = str(re.split(', |\(|\)', command.split(" ", 1)[1])[2].split("R", 1)[1])
 
 				else:
 					var2 = str(re.split(', ', command.split(" ", 1)[1])[1].split("R", 1)[1])
-
-				if cmd == "LD" or cmd == "SD":
-					var3 = str(re.split(', |\(|\)', command.split(" ", 1)[1])[2].split("R", 1)[1])
-				else:
 					var3 = str(re.split(r'R|#', re.split(', ', command.split(" ", 1)[1])[2])[1])
 
 				if cmd == "LD":
@@ -49,6 +52,11 @@ def index(request):
 				elif cmd == "SLT":
 					output.append('000000' + format(int(var2), '05b') + format(int(var3), '05b') + format(int(var1), '05b') + '00000101010')
 
+				else:
+					error = True
+					MipsProgram.objects.all().delete()
+					break;
+
 				MipsProgram.objects.create(id=i, addr=str(format((len(output)-1)*4, '04x')).upper(), opcode=str(format(int(output[-1], 2), '08x')).upper(), instruction=command)
 
 				hexoutput.append(str(format(int(output[-1], 2), '08x')).upper())
@@ -60,18 +68,25 @@ def index(request):
 			context = {
 				'progObjects': progObjects,
 				'error': error,
+				'cmdarr': cmdarr,
 			}
 			return render(request, 'processor/index.html', context)
 			
 		except:
+			error = True
+			MipsProgram.objects.all().delete()
+
 			context = {
 				'progObjects': progObjects,
+				'error': error,
+				'cmdarr': cmdarr,
 			}
 
 			return render(request, 'processor/index.html', context)
 	
 	context = {
 		'progObjects': progObjects,
+		'error': error,
 	}
 
 	return render(request, 'processor/index.html', context)
