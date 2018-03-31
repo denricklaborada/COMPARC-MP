@@ -46,14 +46,19 @@
                   <div class="float-right"><button type="submit" class="btn btn-light btn-sm">Load ▶</button></div><br><br>
                     {% if error %}
                       <div class="alert alert-danger" role="alert">
-                        ERROR!
+                        ERROR! Register out of bound
                       </div>
                     {% endif %}
-                  <textarea rows="25" cols="78" name="commands" style="resize:none;">{% for cmd in cmdarr %}{{ cmd }}&#13;&#10;{% endfor %}</textarea>
+                  <textarea rows="25" cols="78" name="commands" style="width:100%; resize:none;">{% for prog in progObjects %}{{ prog.instruction }}&#13;&#10;{% endfor %}</textarea>
                 </form>
+              <a class="btn btn-primary" href="{% url 'processor:initialize' %}">Initialize</a>
+              <a class="btn btn-primary" href="{% url 'processor:regInput' %}">RegInput</a>
+              <button href="#" type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
+                Reg/Mem Input
+              </button>
             </td>
             <td width=60% style="background:#272f45;color:#fff;padding:1%;">
-              <table class="table">
+              <table class="table table-sm">
                 <thead>
                   <tr>
                     <th scope="col">Address</th>
@@ -62,21 +67,58 @@
                   </tr>
                 </thead>
                 <tbody>
-                  {% if not error %}
                   {% for prog in progObjects %}
                   <tr>
+                    {% if not error %}
                     <th scope="row">{{ prog.addr }}</th>
                     <td>{{ prog.instruction }}</td>
                     <td>{{ prog.opcode }}</td>
+                    {% endif %}
                   </tr>
                   {% endfor %}
-                  {% endif %}
                 </tbody>
               </table>
             </td>
         </tr>
     </table>
-    <a class="btn btn-success" href="{% url 'processor:initialize' %}">Initialize</a>
-    <a class="btn btn-success" href="{% url 'processor:regInput' %}">Reg Input</a>
+
+
+
+
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Register/Memory Input</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Modal body content -->
+            <form class="form-inline">
+              <label class="sr-only" for="inlineFormInputGroup">Register</label>
+              <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+                <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="Enter Register number">
+              </div>
+
+              <label class="sr-only" for="inlineFormInput">Value</label>
+              <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput" placeholder="Enter value">
+              <button id="add_new" type="submit" class="btn btn-primary btn-sm">+</button>
+            </form>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
   </body>
 </html>
