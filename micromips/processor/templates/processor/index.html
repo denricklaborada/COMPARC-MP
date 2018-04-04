@@ -1,66 +1,46 @@
 {% extends 'processor/extends/header.html' %}
 
-  {% block body %}
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">microMIPS</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item active">
-            <a class="nav-link" href="#">Opcode <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Pipeline</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Internal</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-
-    <table width=100% height=100% style="margin-left:10px;">
-        <tr>
-            <td width=40% style="background:#fff; padding:1%;">Please enter codes here
-                <form method="POST">
-                  {% csrf_token %}
-                  <div class="float-right"><button type="submit" class="btn btn-light btn-sm">Load ▶</button></div><br><br>
-                    {% if error %}
-                      <div class="alert alert-danger" role="alert">
-                        ERROR! Register out of bound
-                      </div>
-                    {% endif %}
-                  <textarea rows="25" cols="78" name="commands" style="width:100%; resize:none;">{% for prog in progObjects %}{{ prog.instruction }}&#13;&#10;{% endfor %}</textarea>
-                </form>
-              <a class="btn btn-primary" href="{% url 'processor:initialize' %}">Initialize</a>
-              <a class="btn btn-primary" href="{% url 'processor:regInput' %}">Register Input</a>
-              <a class="btn btn-primary" href="{% url 'processor:memInput' %}">Memory Input</a>
-            </td>
-            <td width=60% style="background:#272f45;color:#fff;padding:1%;">
-              <table class="table table-sm">
-                <thead>
-                  <tr>
-                    <th scope="col">Address</th>
-                    <th scope="col">Command</th>
-                    <th scope="col">Opcode</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for prog in progObjects %}
-                  <tr>
-                    {% if not error %}
-                    <th scope="row">{{ prog.addr }}</th>
-                    <td>{{ prog.instruction }}</td>
-                    <td>{{ prog.opcode }}</td>
-                    {% endif %}
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </td>
-        </tr>
-    </table>
-
-  {% endblock %}
+{% block body %}
+  <table width=100% height=100% style="margin-left:10px;">
+    <tr>
+      <td width=40% style="background:#fff; padding:1%;">
+        {% if error %}
+          <div class="alert alert-danger" role="alert">
+            ERROR! Register out of bound
+          </div>
+        {% endif %}
+        <div class="float-left">Please enter codes here</div>
+        <form method="POST">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-dark btn-sm float-right mb-3">Load ▶</button>
+          <a class="btn btn-dark btn-sm float-right mb-3 mr-1" href="{% url 'processor:initialize' %}">Reset</a>
+          <div>
+            <textarea rows="25" cols="78" name="commands" style="width:100%; resize:none;">{% for prog in progObjects %}{{ prog.instruction }}&#13;&#10;{% endfor %}</textarea>
+          </div>
+        </form>
+      </td>
+      <td width=60% style="background:#272f45;color:#fff;padding:1%;">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th scope="col">Address</th>
+              <th scope="col">Command</th>
+              <th scope="col">Opcode</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for prog in progObjects %}
+            <tr>
+              {% if not error %}
+              <th scope="row">{{ prog.addr }}</th>
+              <td>{{ prog.instruction }}</td>
+              <td>{{ prog.opcode }}</td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </table>
+{% endblock %}
