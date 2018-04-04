@@ -72,12 +72,11 @@ def index(request):
 								output.append('001000' + format(int(var1), '05b') + format(int(var2), '05b') + format(int(index2-1),
 																										  '016b'))
 				elif cmd == 'J':
-					print('until j')
 					for index2, cmd2 in enumerate(cmdarr):
 						if ':' in cmd2:
 							label2 = str(cmd2.split(":", 1)[0])
 							if label2 == var1:
-								output.append('000010' + '0000000000000' + '1' + format(int(index2*4), '012b'))
+								output.append('000010' + format(int(index2), '026b'))
 
 				else:
 					error = True
