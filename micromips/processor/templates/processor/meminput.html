@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Memory Input</title>
+</head>
+<body>
+    <form method="POST">
+        {% csrf_token %}
+        <label class="sr-only" for="inlineFormInput">Memory Address</label>
+        <input type="text" name="memAddr" class="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput" placeholder="Enter address">
+
+        <label class="sr-only" for="inlineFormInput">Value</label>
+        <input type="text" name="memVal" class="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput" placeholder="Enter value">
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

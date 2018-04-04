@@ -8,7 +8,6 @@ def index(request):
 	error = False
 
 	if request.method == 'POST':
-		
 		MipsProgram.objects.all().delete()
 
 		try:
@@ -17,22 +16,35 @@ def index(request):
 			output = []
 			hexoutput = []
 			i = 0
+			label = ''
 
-			for command in cmdarr:
-				cmd = str(command.split(" ", 1)[0])
-				var1 = str(re.split(', ', command.split(" ", 1)[1])[0].split("R", 1)[1])
-				if int(var1) < 0 or int(var1) > 31:
-					error = True
-					MipsProgram.objects.all().delete()
-					break;
-
-				if cmd == "LD" or cmd == "SD":
-					var2 = str(re.split(', |\(|\)', command.split(" ", 1)[1])[1])
-					var3 = str(re.split(', |\(|\)', command.split(" ", 1)[1])[2].split("R", 1)[1])
-
+			for index, command in enumerate(cmdarr):
+				if ':' in command:
+					label = str(command.split(":", 1)[0])
+					cmd = str(str(command.split(":", 1)[1]).split(" ", 1)[0])
 				else:
-					var2 = str(re.split(', ', command.split(" ", 1)[1])[1].split("R", 1)[1])
-					var3 = str(re.split(r'R|#', re.split(', ', command.split(" ", 1)[1])[2])[1])
+					cmd = str(command.split(" ", 1)[0])
+
+				if cmd == 'J':
+					var1 = str(command.split(" ", 1)[1])
+				else:
+					var1 = str(re.split(', ', command.split(" ", 1)[1])[0].split("R", 1)[1])
+					if int(var1) < 0 or int(var1) > 31:
+						error = True
+						MipsProgram.objects.all().delete()
+						break;
+
+					if cmd == "LD" or cmd == "SD":
+						var2 = str(re.split(', |\(|\)', command.split(" ", 1)[1])[1])
+						var3 = str(re.split(', |\(|\)', command.split(" ", 1)[1])[2].split("R", 1)[1])
+
+					elif cmd == 'BEQC':
+						var2 = str(re.split(', ', command.split(" ", 1)[1])[1].split("R", 1)[1])
+						var3 = str(re.split(', ', command.split(" ", 1)[1])[2])
+
+					else:
+						var2 = str(re.split(', ', command.split(" ", 1)[1])[1].split("R", 1)[1])
+						var3 = str(re.split(r'R|#', re.split(', ', command.split(" ", 1)[1])[2])[1])
 
 				if cmd == "LD":
 					output.append('110111'+ format(int(var3), '05b') + format(int(var1), '05b') + format(int(var2[0], 16), '04b') + format(int(var2[1], 16), '04b') + format(int(var2[2], 16), '04b') + format(int(var2[3], 16), '04b'))
@@ -52,12 +64,32 @@ def index(request):
 				elif cmd == "SLT":
 					output.append('000000' + format(int(var2), '05b') + format(int(var3), '05b') + format(int(var1), '05b') + '00000101010')
 
+				elif cmd == 'BEQC':
+					for index2, cmd2 in enumerate(cmdarr[index:]):
+						if ':' in cmd2:
+							label2 = str(cmd2.split(":", 1)[0])
+							if label2 == var3:
+								output.append('001000' + format(int(var1), '05b') + format(int(var2), '05b') + format(int(index2-1),
+																										  '016b'))
+				elif cmd == 'J':
+					print('until j')
+					for index2, cmd2 in enumerate(cmdarr):
+						if ':' in cmd2:
+							label2 = str(cmd2.split(":", 1)[0])
+							if label2 == var1:
+								output.append('000010' + '0000000000000' + '1' + format(int(index2*4), '012b'))
+
 				else:
 					error = True
 					MipsProgram.objects.all().delete()
 					break;
 
-				MipsProgram.objects.create(id=i, addr=str(format((len(output)-1)*4, '04x')).upper(), opcode=str(format(int(output[-1], 2), '08x')).upper(), instruction=command)
+				if not label == '':
+					MipsProgram.objects.create(id=i, addr='1' + str(format((len(output) - 1) * 4, '03x')).upper(),
+											   opcode=str(format(int(output[-1], 2), '08x')).upper(), label=label,
+											   instruction=command)
+				else:
+					MipsProgram.objects.create(id=i, addr='1' + str(format((len(output)-1)*4, '03x')).upper(), opcode=str(format(int(output[-1], 2), '08x')).upper(), instruction=command)
 
 				hexoutput.append(str(format(int(output[-1], 2), '08x')).upper())
 
@@ -92,11 +124,42 @@ def index(request):
 	return render(request, 'processor/index.html', context)
 
 def regInput(request):
-	regObject = Register.objects.filter(id=1).get()
-	regObject.value = 'FFFFFFFFFFFFFFFF'
-	regObject.save()
+	if request.method == 'POST':
+		regnum = request.POST['regNum']
+		regval = request.POST['regVal']
+		leading = ''
+		if len(regval) < 16:
+			for i in range(16-len(regval)):
+				leading += '0'
 
-	return redirect('/')
+			regval = leading + regval
+
+		regObject = Register.objects.filter(id=regnum).get()
+		regObject.value = regval
+		regObject.save()
+
+		return redirect('/')
+
+	return render(request, 'processor/reginput.html')
+
+def memInput(request):
+	if request.method == 'POST':
+		memaddr = request.POST['memAddr']
+		memval = request.POST['memVal']
+		leading = ''
+		if len(memval) < 16:
+			for i in range(16-len(memval)):
+				leading += '0'
+
+			memval = leading + memval
+
+		memObject = DataSegment.objects.filter(addr=memaddr).get()
+		memObject.value = memval
+		memObject.save()
+
+		return redirect('/')
+
+	return render(request, 'processor/meminput.html')
 
 def initialize(request):
 	regObjects = Register.objects.all()

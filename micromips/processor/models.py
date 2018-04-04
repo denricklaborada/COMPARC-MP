@@ -21,6 +21,7 @@ class DataSegment(models.Model):
 class MipsProgram(models.Model):
 	addr = models.CharField(blank=True, max_length=4)
 	opcode = models.CharField(blank=True, max_length=8)
+	label = models.CharField(blank=True, max_length=20)
 	instruction = models.CharField(blank=True, max_length=50)
 
 	def __str__(self):
