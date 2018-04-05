@@ -1,7 +1,7 @@
 {% extends 'processor/extends/header.html' %}
 
 {% block body %}
-  <table width=100% style="margin-left:10px;height:300px;">
+  <table style="margin-left:10px;height:300px;width:100%;display:block;">
     <tr style="table-layout:fixed;">
       <td width=40% style="background:#fff; padding:1%;">
         {% if error %}
@@ -21,20 +21,20 @@
       </td>
       <td width=60% style="background:#272f45;color:#fff;padding:1%;">
         <table class="table table-sm">
-          <thead>
+          <thead style="display:block;width:100%;height:35px;">
             <tr>
-              <th scope="col">Address</th>
-              <th scope="col">Command</th>
-              <th scope="col">Opcode</th>
+              <th style="width:20%;" scope="col">Address</th>
+              <th style="width:20%;" scope="col">Command</th>
+              <th style="width:20%;" scope="col">Opcode</th>
             </tr>
           </thead>
-          <tbody style="overflow:scroll; height:300px;">
+          <tbody style="height:300px;display:block;width:100%;overflow:auto;">
             {% for prog in progObjects %}
             <tr>
               {% if not error %}
-              <th scope="row">{{ prog.addr }}</th>
-              <td>{{ prog.instruction }}</td>
-              <td>{{ prog.opcode }}</td>
+              <td style="width:20%;" scope="row">{{ prog.addr }}</td>
+              <td style="width:20%;">{{ prog.instruction }}</td>
+              <td style="width:20%;">{{ prog.opcode }}</td>
               {% endif %}
             </tr>
             {% endfor %}
@@ -43,12 +43,11 @@
       </td>
     </tr>
     <tr>
-      <td>Pipeline
+      <td style="background:#272f45;color:#fff;">Pipeline
         <table class="table table-sm">
           {% for prog in progObjects %}
           <tr>
             <td>{{ prog.instruction }}</td>
-            <td>
           </tr>
           {% endfor %}
         </table>
