@@ -19,22 +19,22 @@
           </div>
         </form>
       </td>
-      <td width=60% style="background:#272f45;color:#fff;padding:1%;">
-        <table class="table table-sm">
-          <thead style="display:block;width:100%;height:35px;">
+      <td width=60% style="padding: 1%;">Opcode
+        <table class="table table-sm" style="background:#272f45;color:#fff;">
+          <thead style="display:block;width:100%;">
             <tr>
-              <th style="width:20%;" scope="col">Address</th>
-              <th style="width:20%;" scope="col">Command</th>
-              <th style="width:20%;" scope="col">Opcode</th>
+              <th style="width:1%;" scope="col">Address</th>
+              <th style="width:1%;" scope="col">Command</th>
+              <th style="width:1%;" scope="col">Opcode</th>
             </tr>
           </thead>
           <tbody style="height:300px;display:block;width:100%;overflow:auto;">
             {% for prog in progObjects %}
             <tr>
               {% if not error %}
-              <td style="width:20%;" scope="row">{{ prog.addr }}</td>
-              <td style="width:20%;">{{ prog.instruction }}</td>
-              <td style="width:20%;">{{ prog.opcode }}</td>
+              <td style="width:1%;">{{ prog.addr }}</td>
+              <td style="width:1%;">{{ prog.instruction }}</td>
+              <td style="width:1%;">{{ prog.opcode }}</td>
               {% endif %}
             </tr>
             {% endfor %}
@@ -43,28 +43,66 @@
       </td>
     </tr>
     <tr>
-      <td style="background:#272f45;color:#fff;">Pipeline
-        <table class="table table-sm">
-          {% for prog in progObjects %}
-          <tr>
-            <td>{{ prog.instruction }}</td>
-          </tr>
-          {% endfor %}
+     <td style="padding: 1%;">Internal
+        <table class="table table-sm table-bordered" style="background:#272f45;color:#fff;">
+          <thead>
+            <tr>
+              <th style="width:1%;" scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>IF/ID.IR</td>
+            </tr>
+            <tr>
+              <td>IF/ID.NPC,PC</td>
+            </tr>
+            <tr>
+              <td>ID/EX.A</td>
+            </tr>
+            <tr>
+              <td>ID/EX.NPC</td>
+            </tr>
+            <tr>
+              <td>ID/EX.Imm</td>
+            </tr>
+            <tr>
+              <td>EX/MEM.IR</td>
+            </tr>
+            <tr>
+              <td>EX/MEM.ALUOutput</td>
+            </tr>
+            <tr>
+              <td>EX/MEM.cond</td>
+            </tr>
+            <tr>
+              <td>MEM/WB.IR</td>
+            </tr>
+            <tr>
+              <td>MEM/WB.ALUOutput</td>
+            </tr>
+            <tr>
+              <td>WB</td>
+            </tr>
+          </tbody>
         </table>
-
-
-
-
       </td>
-      <td>Internal
-        <table>
-
+      
+      <td style="padding: 1%;">Pipeline
+        <table class="table table-sm table-bordered" style="background:#272f45;color:#fff;">
+          <thead>
+            <tr>
+              <th style="width:1%;" scope="col">Instuction</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for prog in progObjects %}
+            <tr>
+              <td>{{ prog.instruction }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
         </table>
-
-
-
-
-
       </td>
     </tr>
   </table>
