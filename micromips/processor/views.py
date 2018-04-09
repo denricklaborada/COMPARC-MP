@@ -168,9 +168,13 @@ def regInput(request):
 		regObject.value = regval
 		regObject.save()
 
-		return redirect('/')
+	reg = Register.objects.all()
 
-	return render(request, 'processor/reginput.html')
+	context = {
+		'reg': reg,
+	}
+
+	return render(request, 'processor/reginput.html', context)
 
 def memInput(request):
 	if request.method == 'POST':
@@ -187,9 +191,13 @@ def memInput(request):
 		memObject.value = memval
 		memObject.save()
 
-		return redirect('/')
+	mem = DataSegment.objects.all()
 
-	return render(request, 'processor/meminput.html')
+	context = {
+		'mem': mem,
+	}
+
+	return render(request, 'processor/meminput.html', context)
 
 def initialize(request):
 	regObjects = Register.objects.all()

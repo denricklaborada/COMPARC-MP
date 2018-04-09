@@ -52,5 +52,23 @@ Register Input
       </form>
     </div>
   </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Register</th>
+        <th scope="col">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in reg %}
+      <tr>
+        <th scope="row">R{{ r.id }}</th>
+        <td>{{ r.value }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
+
 {% endblock %}

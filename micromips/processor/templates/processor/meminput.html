@@ -4,6 +4,48 @@
 Memory Input
 {% endblock %}
 
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        window.onscroll = function() {myFunction();};
+
+            function myFunction() {
+                if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                    document.getElementById("up").style.visibility = "visible";
+                } else {
+                    document.getElementById("up").style.visibility = "hidden";
+                }
+            }
+
+        $("#findbtn").click(function (){
+            var given = $("#goToAddress").val();
+            var x = parseInt(given) / 8;
+            var y = (parseInt(x) * 8).toString(16);
+            while(y.length < 4){
+                y = "0" + y;
+            }
+            y = y.toUpperCase();
+            $('.bg-info').removeClass('bg-info');
+            $('html, body').animate({
+                scrollTop: (
+                    $('#myTable th').filter(function() {
+                        return $(this).text() == y;
+                    }).closest('tr').addClass("bg-info").offset().top
+                )
+            },500);
+        });
+    });
+
+    function topFunction() {
+        $('html, body').animate({
+            scrollTop: ($('body').offset().top)
+        },500);
+
+    }
+    
+</script>
+{% endblock %}
+
 {% block body %}
 <div class="container m-5">
     <div class="card">
@@ -20,5 +62,38 @@ Memory Input
             </form>
         </div>
     </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Go To Memory</h5>
+            <label class="sr-only" for="inlineFormInput">Address</label>
+            <input type="text" id="goToAddress" class="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput" placeholder="Enter address">
+            <button id="findbtn" class="btn btn-primary">Find</button>
+        </div>
+    </div>
+
+    <table id="myTable" class="table">
+        <thead>
+            <tr>
+                <th scope="col">Memory</th>
+                <th scope="col">Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in mem %}
+            <tr class="clickable-row">
+                <th scope="row" id="{{ m.addr }}">{{ m.addr }}</th>
+                <td>{{ m.value }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+  </table>
+</div>
+<div id="uparrow" class="icon" style="cursor: pointer;" onclick="topFunction();">
+    <i id="up" class="fa fa-chevron-up"  style="visibility:hidden; position: fixed;
+      bottom: 20px;
+      right: 30px;
+      z-index: 99;font-size:50px;"></i>
 </div>
 {% endblock %}
+
