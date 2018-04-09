@@ -15,10 +15,14 @@ def index(request):
 			cmdarr = commands.splitlines()
 			output = []
 			hexoutput = []
+			pipeline = []
 			i = 0
 			label = ''
 
 			for index, command in enumerate(cmdarr):
+				temp = []
+				dependent = -1
+
 				if ':' in command:
 					label = str(command.split(":", 1)[0])
 					cmd = str(str(command.split(":", 1)[1]).split(" ", 1)[0])
@@ -69,8 +73,8 @@ def index(request):
 						if ':' in cmd2:
 							label2 = str(cmd2.split(":", 1)[0])
 							if label2 == var3:
-								output.append('001000' + format(int(var1), '05b') + format(int(var2), '05b') + format(int(index2-1),
-																										  '016b'))
+								output.append('001000' + format(int(var1), '05b') + format(int(var2), '05b') + format(int(index2-1), '016b'))
+				
 				elif cmd == 'J':
 					for index2, cmd2 in enumerate(cmdarr):
 						if ':' in cmd2:
@@ -84,11 +88,11 @@ def index(request):
 					break;
 
 				if not label == '':
-					MipsProgram.objects.create(id=i, addr='1' + str(format((len(output) - 1) * 4, '03x')).upper(),
-											   opcode=str(format(int(output[-1], 2), '08x')).upper(), label=label,
-											   instruction=command)
+					if cmd == "LD" or cmd == "DADDIU" or cmd == "XORI" or cmd == "SLT":
+						MipsProgram.objects.create(id=i, addr='1' + str(format((len(output) - 1) * 4, '03x')).upper(), opcode=str(format(int(output[-1], 2), '08x')).upper(), label=label, instruction=command, cmd=cmd, dest=var1, src1=var2, src2=var3)
 				else:
-					MipsProgram.objects.create(id=i, addr='1' + str(format((len(output)-1)*4, '03x')).upper(), opcode=str(format(int(output[-1], 2), '08x')).upper(), instruction=command)
+					if cmd == "LD" or cmd == "DADDIU" or cmd == "XORI" or cmd == "SLT":
+						MipsProgram.objects.create(id=i, addr='1' + str(format((len(output) - 1) * 4, '03x')).upper(), opcode=str(format(int(output[-1], 2), '08x')).upper(), instruction=command, cmd=cmd, dest=var1, src1=var2, src2=var3)
 
 				hexoutput.append(str(format(int(output[-1], 2), '08x')).upper())
 
@@ -96,10 +100,35 @@ def index(request):
 
 			progObjects = MipsProgram.objects.all()
 
+			for i in range(progObjects.count()):
+				temp = []
+				dependent = -1
+
+				if i == 0:
+					pipeline.append(['IF', 'ID', 'EX', 'MEM', 'WB'])
+				else:
+					for j in range(pipeline[i-1].index("ID")):
+						temp.append(" ")
+					temp.append("IF")
+					for k in range(progObjects.count() - 1):
+						if MipsProgram.objects.get(id=k).dest == MipsProgram.objects.get(id=i).src1 or MipsProgram.objects.get(id=k).dest == MipsProgram.objects.get(id=i).src2:
+							dependent = k
+					if not dependent == -1:	
+						while pipeline[dependent].index("WB") > len(temp):
+							temp.append("*")
+								
+					temp.append('ID')
+					temp.append('EX')
+					temp.append('MEM')
+					temp.append('WB')
+					pipeline.append(temp)
+
 			context = {
 				'progObjects': progObjects,
 				'error': error,
 				'cmdarr': cmdarr,
+				'pipeline': pipeline,
+				'pipLast': range(1, len(pipeline[-1]) + 1),
 			}
 			return render(request, 'processor/index.html', context)
 			
@@ -111,6 +140,8 @@ def index(request):
 				'progObjects': progObjects,
 				'error': error,
 				'cmdarr': cmdarr,
+				'pipeline': pipeline,
+				'pipLast': range(1, len(pipeline[-1]) + 1),
 			}
 
 			return render(request, 'processor/index.html', context)

@@ -23,6 +23,10 @@ class MipsProgram(models.Model):
 	opcode = models.CharField(blank=True, max_length=8)
 	label = models.CharField(blank=True, max_length=20)
 	instruction = models.CharField(blank=True, max_length=50)
+	cmd = models.CharField(blank=True, max_length=20)
+	dest = models.CharField(blank=True, max_length=4)
+	src1 = models.CharField(blank=True, max_length=4)
+	src2 = models.CharField(blank=True, max_length=4)
 
 	def __str__(self):
 		return str(self.addr)

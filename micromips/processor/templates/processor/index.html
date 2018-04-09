@@ -1,4 +1,5 @@
 {% extends 'processor/extends/header.html' %}
+{% load filterarrays %}
 
 {% block body %}
   <table style="margin-left:10px;height:300px;width:100%;display:block;">
@@ -92,13 +93,15 @@
         <table class="table table-sm table-bordered" style="background:#272f45;color:#fff;">
           <thead>
             <tr>
-              <th style="width:1%;" scope="col">Instuction</th>
+              <th style="width:1%;" scope="col">Instruction</th>
+              {% for p in pipLast %}<th>{{ p }}</th>{% endfor %}
             </tr>
           </thead>
           <tbody>
             {% for prog in progObjects %}
-            <tr>
+            <tr class="pipelineRows">
               <td>{{ prog.instruction }}</td>
+              {% if pipeline %}{% for pip in pipeline|index:forloop.counter0 %}<td>{{ pip }}</td>{% endfor %}{% endif %}
             </tr>
             {% endfor %}
           </tbody>
@@ -107,3 +110,5 @@
     </tr>
   </table>
 {% endblock %}
+
+
