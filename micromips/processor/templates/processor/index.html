@@ -1,6 +1,20 @@
 {% extends 'processor/extends/header.html' %}
 {% load filterarrays %}
 
+{% block scripts %}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>
+    $(document).ready(function(){
+        $("table#pipeline").hide();
+
+        $("#fullbutton").click(function(){
+            $("table#pipeline").show();
+        });
+    });
+  </script>
+
+{% endblock %}
+
 {% block body %}
   <table style="margin-left:10px;height:300px;width:100%;display:block;">
     <tr style="table-layout:fixed;">
@@ -88,9 +102,11 @@
           </tbody>
         </table>
       </td>
-      
+
       <td style="padding: 1%;">Pipeline
-        <table class="table table-sm table-bordered" style="background:#272f45;color:#fff;">
+        <button id="fullbutton" type="button" class="btn btn-dark btn-sm float-right mb-3 mr-1">Full</button>
+        <button id="singlebutton" type="button" class="btn btn-dark btn-sm float-right mb-3 mr-1">Single</button>
+        <table id="pipeline" class="table table-sm table-bordered" style="background:#272f45;color:#fff;">
           <thead>
             <tr>
               <th style="width:1%;" scope="col">Instruction</th>
