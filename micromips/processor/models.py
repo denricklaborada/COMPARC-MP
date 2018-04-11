@@ -27,6 +27,7 @@ class MipsProgram(models.Model):
 	dest = models.CharField(blank=True, max_length=4)
 	src1 = models.CharField(blank=True, max_length=4)
 	src2 = models.CharField(blank=True, max_length=4)
+	jumpTo = models.CharField(blank=True, max_length=20)
 
 	def __str__(self):
 		return str(self.addr)
