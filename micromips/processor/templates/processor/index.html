@@ -36,7 +36,7 @@
 {% endblock %}
 
 {% block body %}
-  <table style="margin-left:10px;height:300px;width:100%;display:block;">
+  <table style="margin-left:10px;height:270px;width:100%;display:block;">
     <tr style="table-layout:fixed;">
       <td width=40% style="background:#fff; padding:1%;">
         {% if error %}
@@ -63,7 +63,7 @@
               <th style="width:1%;" scope="col">Opcode</th>
             </tr>
           </thead>
-          <tbody style="height:300px;display:block;width:100%;overflow:auto;">
+          <tbody style="height:270px;display:block;width:100%;overflow:auto;">
             {% for prog in progObjects %}
             <tr>
               {% if not error %}
@@ -79,10 +79,10 @@
     </tr>
     <tr>
      <td style="padding: 1%;">Internal
-        <table class="table table-sm table-bordered" style="background:#272f45;color:#fff;">
+        <table class="table table-sm table-bordered" style="background:#272f45;color:#fff;height:420px;display:block;width:100%;overflow:auto;">
           <thead>
             <tr>
-              <th style="width:1%;" scope="col"></th>
+              <th style="width:1%;" scope="col">Internal Registers</th>
             </tr>
           </thead>
           <tbody>
@@ -124,9 +124,11 @@
       </td>
 
       <td style="padding: 1%;">Pipeline
+        {% if pipeline %}
         <button id="fullbutton" type="button" class="btn btn-dark btn-sm float-right mb-3 mr-1">Full</button>
         <button id="singlebutton" type="button" class="btn btn-dark btn-sm float-right mb-3 mr-1">Single</button>
-        <table id="pipeline" class="table table-sm table-bordered" style="background:#272f45;color:#fff;">
+        {% endif %}
+        <table id="pipeline" class="table table-sm table-bordered" style="background:#272f45;color:#fff;height:420px;display:block;width:100%;overflow:auto;">
           <thead>
             <tr>
               <th style="width:1%;" scope="col">Instruction</th>
