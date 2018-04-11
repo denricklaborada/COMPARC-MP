@@ -90,9 +90,13 @@ def index(request):
 				if not label == '':
 					if cmd == "LD" or cmd == "DADDIU" or cmd == "XORI" or cmd == "SLT":
 						MipsProgram.objects.create(id=i, addr='1' + str(format((len(output) - 1) * 4, '03x')).upper(), opcode=str(format(int(output[-1], 2), '08x')).upper(), label=label, instruction=command, cmd=cmd, dest=var1, src1=var2, src2=var3)
+					elif cmd == "SD":
+						MipsProgram.objects.create(id=i, addr='1' + str(format((len(output) - 1) * 4, '03x')).upper(), opcode=str(format(int(output[-1], 2), '08x')).upper(), label=label, instruction=command, cmd=cmd, dest=var2, src1=var1, src2=var3)
 				else:
 					if cmd == "LD" or cmd == "DADDIU" or cmd == "XORI" or cmd == "SLT":
 						MipsProgram.objects.create(id=i, addr='1' + str(format((len(output) - 1) * 4, '03x')).upper(), opcode=str(format(int(output[-1], 2), '08x')).upper(), instruction=command, cmd=cmd, dest=var1, src1=var2, src2=var3)
+					elif cmd == "SD":
+						MipsProgram.objects.create(id=i, addr='1' + str(format((len(output) - 1) * 4, '03x')).upper(), opcode=str(format(int(output[-1], 2), '08x')).upper(), instruction=command, cmd=cmd, dest=var2, src1=var1, src2=var3)
 
 				hexoutput.append(str(format(int(output[-1], 2), '08x')).upper())
 
@@ -125,6 +129,7 @@ def index(request):
 
 			context = {
 				'progObjects': progObjects,
+				'objectCount': progObjects.count(),
 				'error': error,
 				'cmdarr': cmdarr,
 				'pipeline': pipeline,
@@ -138,6 +143,7 @@ def index(request):
 
 			context = {
 				'progObjects': progObjects,
+				'objectCount': progObjects.count(),
 				'error': error,
 				'cmdarr': cmdarr,
 				'pipeline': pipeline,
@@ -148,6 +154,7 @@ def index(request):
 	
 	context = {
 		'progObjects': progObjects,
+		'objectCount': progObjects.count(),
 		'error': error,
 	}
 

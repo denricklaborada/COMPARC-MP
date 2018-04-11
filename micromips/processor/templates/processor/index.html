@@ -4,14 +4,32 @@
 {% block scripts %}
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script>
-    $(document).ready(function(){
-        $("table#pipeline").hide();
+    $(document).ready(function() {
+        var counter = 0;
+        var numObject = "{{  objectCount|safe }}";
+
+        $('.pipRows').hide();
+        $('.pipelineCycles').hide();
 
         $("#fullbutton").click(function(){
-            $("table#pipeline").show();
+            $('.pipRows').show();
+            $('.pipelineCycles').show();
             $("#fullbutton").attr("disabled", 'true');
             $("#singlebutton").attr("disabled", 'true');
         });
+
+        $("#singlebutton").click(function(){
+          $('.pipelineCycles').eq(counter).show();
+          for (var i = 0; i < parseInt(numObject); i++) {
+            var str = '.pipelineRows' + counter.toString();
+            $(str).show();
+          }
+          counter += 1;
+
+        });
+
+        
+
     });
   </script>
 
@@ -112,14 +130,14 @@
           <thead>
             <tr>
               <th style="width:1%;" scope="col">Instruction</th>
-              {% for p in pipLast %}<th>{{ p }}</th>{% endfor %}
+              {% for p in pipLast %}<th class="pipelineCycles">{{ p }}</th>{% endfor %}
             </tr>
           </thead>
           <tbody>
             {% for prog in progObjects %}
-            <tr class="pipelineRows">
+            <tr>
               <td>{{ prog.instruction }}</td>
-              {% if pipeline %}{% for pip in pipeline|index:forloop.counter0 %}<td>{{ pip }}</td>{% endfor %}{% endif %}
+              {% if pipeline %}{% for pip in pipeline|index:forloop.counter0 %}<td class="pipelineRows{{forloop.counter0}} pipRows">{{ pip }}</td>{% endfor %}{% endif %}
             </tr>
             {% endfor %}
           </tbody>
