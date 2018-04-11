@@ -9,6 +9,8 @@
 
         $("#fullbutton").click(function(){
             $("table#pipeline").show();
+            $("#fullbutton").attr("disabled", 'true');
+            $("#singlebutton").attr("disabled", 'true');
         });
     });
   </script>
