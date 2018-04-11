@@ -19,7 +19,7 @@ Memory Input
 
         $("#findbtn").click(function (){
             var given = $("#goToAddress").val();
-            var x = parseInt(given) / 8;
+            var x = parseInt(given, 16) / 8;
             var y = (parseInt(x) * 8).toString(16);
             while(y.length < 4){
                 y = "0" + y;
