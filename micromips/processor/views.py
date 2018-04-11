@@ -117,6 +117,10 @@ def index(request):
 			lengthOfLast = 0
 			jumpLocation = ''
 			lastCmd = -1
+			allocate = 2
+			btrigger = False
+			jtrigger = False
+			foundj = False
 
 			for i in range(progObjects.count()):
 				temp = []
@@ -125,10 +129,9 @@ def index(request):
 				if i == 0:
 					pipeline.append(['IF', 'ID', 'EX', 'MEM', 'WB'])
 				else:
-					if not jumpLocation == '':
+					if btrigger or jtrigger:
 						if jumpLocation == MipsProgram.objects.get(id=i).label:
 							jumpLocation = ''
-							print(lastCmd)
 							for j in range(pipeline[lastCmd].index("ID")):
 								temp.append(" ")
 
@@ -139,43 +142,66 @@ def index(request):
 							temp.append('MEM')
 							temp.append('WB')
 							pipeline.append(temp)
+							jtrigger = False
+							btrigger = False
+							allocate = 4
 
 						else:
 							temp.append(" ")
 							pipeline.append(temp)
 					else:
+
 						for j in range(pipeline[i-1].index("ID")):
 							temp.append(" ")
 						temp.append("IF")
 						for k in range(progObjects.count() - 1):
-							if MipsProgram.objects.get(id=k).dest == MipsProgram.objects.get(id=i).src1 or MipsProgram.objects.get(id=k).dest == MipsProgram.objects.get(id=i).src2:
-								dependent = k
+							if not ((MipsProgram.objects.get(id=i).src1 == '' and MipsProgram.objects.get(id=i).src2 == '') or MipsProgram.objects.get(id=k).dest == ''):
+								if MipsProgram.objects.get(id=k).dest == MipsProgram.objects.get(id=i).src1 or MipsProgram.objects.get(id=k).dest == MipsProgram.objects.get(id=i).src2:
+									dependent = k
 						if not dependent == -1:	
 							while pipeline[dependent].index("WB") > len(temp):
 								temp.append("*")
-
+						
 						if MipsProgram.objects.get(id=i-1).cmd == 'BEQC' and Register.objects.get(id=int(MipsProgram.objects.get(id=i-1).src1)).value == Register.objects.get(id=int(MipsProgram.objects.get(id=i-1).src2)).value:
 							if temp[len(temp)-1] == 'IF':
 								temp.append('ID')
 								temp.append('EX')
 								pipeline.append(temp)
 								lastCmd = i
+								btrigger = True
 								jumpLocation = MipsProgram.objects.get(id=i-1).jumpTo
 
 							elif temp[len(temp)-1] == '*':
 								temp.append('ID')
 								pipeline.append(temp)
 								lastCmd = i
+								btrigger = True
 								jumpLocation = MipsProgram.objects.get(id=i-1).jumpTo
-						else:
+
+						elif MipsProgram.objects.get(id=i).cmd == 'J':
+							foundj = True
+							jumpLocation = MipsProgram.objects.get(id=i).jumpTo
 							temp.append('ID')
 							temp.append('EX')
 							temp.append('MEM')
 							temp.append('WB')
 							pipeline.append(temp)
 
-				lengthOfLast = len(temp)
+						else:
+							temp.append('ID')
+							temp.append('EX')
+							temp.append('MEM')
+							temp.append('WB')
+							pipeline.append(temp)
+							print(temp)
+							if foundj and allocate > 0:
+								allocate -= 1
+							elif allocate == 0:
+								foundj = False
+								lastCmd = i
+								jtrigger = True
 				print(pipeline)
+				lengthOfLast = len(temp)
 
 			context = {
 				'progObjects': progObjects,
