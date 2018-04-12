@@ -144,7 +144,7 @@ def index(request):
 							pipeline.append(temp)
 							jtrigger = False
 							btrigger = False
-							allocate = 4
+							allocate = 2
 
 						else:
 							temp.append(" ")
