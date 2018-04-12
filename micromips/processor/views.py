@@ -203,7 +203,27 @@ def index(request):
 				print(pipeline)
 				lengthOfLast = len(temp)
 
+			progObjects = MipsProgram.objects.all()
+# START OF INTERNAL REGISTER
+			for i in range(progObjects.count()):
+				if i == 0:
+					if_idIr = MipsProgram.objects.get(id=i).opcode
+					if_idNpc = format(int(MipsProgram.objects.get(id=i).addr, 16) + 4, '04x')
+					binOpcode = format(int(MipsProgram.objects.get(id=i).opcode, 16), '032b')
+
+					id_exA = Register.objects.get(id=int(binOpcode[6:11], 2)).value
+					id_exB = Register.objects.get(id=int(binOpcode[11:16], 2)).value
+					id
+
+				else:
+					samp = 0
+
 			context = {
+				'if_idIr': if_idIr,
+				'if_idNpc': if_idNpc,
+				'id_exA': id_exA,
+				'id_exB': id_exB,
+				# 'id_exNpc': id_exNpc,
 				'progObjects': progObjects,
 				'objectCount': progObjects.count(),
 				'error': error,
