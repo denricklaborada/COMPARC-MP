@@ -192,7 +192,7 @@ def index(request):
 					regObj.save()
 				elif program.cmd == 'XORI':
 					immediate = str(format(int(str(program.src2)[0], 16), '04b') + format(int(str(program.src2)[1], 16), '04b') + format(int(str(program.src2)[2], 16), '04b') + format(int(str(program.src2)[3], 16), '04b'))
-					val = str(format(int(Register.objects.get(id=int(program.src1)).value), '016b'))
+					val = str(format(int(Register.objects.get(id=int(program.src1)).value, 16), '016b'))
 					print(immediate)
 					print(val)
 					binary = ''
