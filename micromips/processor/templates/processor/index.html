@@ -2,7 +2,6 @@
 {% load filterarrays %}
 
 {% block scripts %}
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script>
     $(document).ready(function() {
         var counter = 0;
@@ -55,15 +54,15 @@
         </form>
       </td>
       <td width=60% style="padding: 1%;">Opcode
-        <table class="table table-sm" style="background:#272f45;color:#fff;">
-          <thead style="display:block;width:100%;">
+        <table class="table table-sm" style="background:#272f45;color:#fff;width: 850px">
+          <thead style="display:block;width:850px;">
             <tr>
               <th style="width:1%;" scope="col">Address</th>
               <th style="width:1%;" scope="col">Command</th>
               <th style="width:1%;" scope="col">Opcode</th>
             </tr>
           </thead>
-          <tbody style="height:270px;display:block;width:100%;overflow:auto;">
+          <tbody style="height:270px;display:block;width:850px;overflow:auto;">
             {% for prog in progObjects %}
             <tr>
               {% if not error %}
@@ -79,7 +78,7 @@
     </tr>
     <tr>
      <td style="padding: 1%;">Internal
-        <table class="table table-sm table-bordered" style="background:#272f45;color:#fff;height:420px;display:block;width:100%;overflow:auto;">
+        <table class="table table-sm table-bordered" style="background:#272f45;color:#fff;height:450px;display:block;width:100%;overflow:auto;">
           <thead>
             <tr>
               <th style="width:1%;" scope="col">Internal Registers</th>
@@ -126,6 +125,7 @@
             </tr>
             <tr>
               <td>WB</td>
+              <td>{{ reg }} = {{ wb }}</td>
             </tr>
           </tbody>
         </table>
@@ -136,7 +136,7 @@
         <button id="fullbutton" type="button" class="btn btn-dark btn-sm float-right mb-3 mr-1">Full</button>
         <button id="singlebutton" type="button" class="btn btn-dark btn-sm float-right mb-3 mr-1">Single</button>
         {% endif %}
-        <table id="pipeline" class="table table-sm table-bordered" style="background:#272f45;color:#fff;height:420px;display:block;width:100%;overflow:auto;">
+        <table id="pipeline" class="table table-sm table-bordered" style="background:#272f45;color:#fff;height:450px;display:block;width:850px;overflow:auto;">
           <thead>
             <tr>
               <th style="width:1%;" scope="col">Instruction</th>

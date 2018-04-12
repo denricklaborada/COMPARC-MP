@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 from django.shortcuts import render, redirect
-import re
+import re, binascii
 from .models import Register, DataSegment, MipsProgram
 
 def index(request):
@@ -57,13 +57,13 @@ def index(request):
 					output.append('110111'+ format(int(var3), '05b') + format(int(var1), '05b') + format(int(var2[0], 16), '04b') + format(int(var2[1], 16), '04b') + format(int(var2[2], 16), '04b') + format(int(var2[3], 16), '04b'))
 
 				elif cmd == "SD":
-					output.append('111111' + format(int(var3), '05b') + format(int(var1), '05b') + format(int(var2[0]), '04b') + format(int(var2[1]), '04b') + format(int(var2[2]), '04b') + format(int(var2[3]), '04b'))
+					output.append('111111' + format(int(var3), '05b') + format(int(var1), '05b') + format(int(var2[0], 16), '04b') + format(int(var2[1], 16), '04b') + format(int(var2[2], 16), '04b') + format(int(var2[3], 16), '04b'))
 
 				elif cmd == "DADDIU":
-					output.append('011001' + format(int(var2), '05b') + format(int(var1), '05b') + format(int(var3[0]), '04b') + format(int(var3[1]), '04b') + format(int(var3[2]), '04b') + format(int(var3[3]), '04b'))
+					output.append('011001' + format(int(var2), '05b') + format(int(var1), '05b') + format(int(var3[0], 16), '04b') + format(int(var3[1], 16), '04b') + format(int(var3[2], 16), '04b') + format(int(var3[3], 16), '04b'))
 
 				elif cmd == "XORI":
-					output.append('001110' + format(int(var2), '05b') + format(int(var1), '05b') + format(int(var3[0]), '04b') + format(int(var3[1]), '04b') + format(int(var3[2]), '04b') + format(int(var3[3]), '04b'))
+					output.append('001110' + format(int(var2), '05b') + format(int(var1), '05b') + format(int(var3[0], 16), '04b') + format(int(var3[1], 16), '04b') + format(int(var3[2], 16), '04b') + format(int(var3[3], 16), '04b'))
 
 				elif cmd == "DADDU":
 					output.append('000000' + format(int(var2), '05b') + format(int(var3), '05b') + format(int(var1), '05b') + '00000101101')
@@ -91,7 +91,7 @@ def index(request):
 					break;
 
 				if not label == '':
-					if cmd == "LD" or cmd == "DADDIU" or cmd == "XORI" or cmd == "SLT":
+					if cmd == "LD" or cmd == "DADDIU" or cmd == "XORI" or cmd == "SLT" or cmd == "DADDU":
 						MipsProgram.objects.create(id=i, addr='1' + str(format((len(output) - 1) * 4, '03x')).upper(), opcode=str(format(int(output[-1], 2), '08x')).upper(), label=label, instruction=command, cmd=cmd, dest=var1, src1=var2, src2=var3)
 					elif cmd == "SD":
 						MipsProgram.objects.create(id=i, addr='1' + str(format((len(output) - 1) * 4, '03x')).upper(), opcode=str(format(int(output[-1], 2), '08x')).upper(), label=label, instruction=command, cmd=cmd, dest=var2, src1=var1, src2=var3)
@@ -100,7 +100,7 @@ def index(request):
 					elif cmd == "J":
 						MipsProgram.objects.create(id=i, addr='1' + str(format((len(output) - 1) * 4, '03x')).upper(), opcode=str(format(int(output[-1], 2), '08x')).upper(), label=label, instruction=command, cmd=cmd, jumpTo=var1)
 				else:
-					if cmd == "LD" or cmd == "DADDIU" or cmd == "XORI" or cmd == "SLT":
+					if cmd == "LD" or cmd == "DADDIU" or cmd == "XORI" or cmd == "SLT" or cmd == "DADDU":
 						MipsProgram.objects.create(id=i, addr='1' + str(format((len(output) - 1) * 4, '03x')).upper(), opcode=str(format(int(output[-1], 2), '08x')).upper(), instruction=command, cmd=cmd, dest=var1, src1=var2, src2=var3)
 					elif cmd == "SD":
 						MipsProgram.objects.create(id=i, addr='1' + str(format((len(output) - 1) * 4, '03x')).upper(), opcode=str(format(int(output[-1], 2), '08x')).upper(), instruction=command, cmd=cmd, dest=var2, src1=var1, src2=var3)
@@ -112,6 +112,115 @@ def index(request):
 				hexoutput.append(str(format(int(output[-1], 2), '08x')).upper())
 
 				i += 1
+
+			
+
+			progObjects = MipsProgram.objects.all()
+# START OF INTERNAL REGISTER
+			lastProg = MipsProgram.objects.get(id=progObjects.count()-1)
+			if lastProg.cmd == 'LD':
+				address = format(int(int(lastProg.src1, 16) + int(int(Register.objects.get(id=int(lastProg.src2)).value, 16)/8)*8), '04x')
+				reg = 'R' + str(lastProg.dest)
+				wb = DataSegment.objects.get(addr=address).value
+			elif lastProg.cmd == 'SD' or lastProg.cmd == 'BEQC' or lastProg.cmd == 'J':
+				reg = ''
+				wb = 'N/A'
+			elif lastProg.cmd == 'DADDIU':
+				immediate = int(Register.objects.get(id=int(lastProg.src1)).value, 16) + int(format(int(str(lastProg.src2)[0], 16), '04b') + format(int(str(lastProg.src2)[1], 16), '04b') + format(int(str(lastProg.src2)[2], 16), '04b') + format(int(str(lastProg.src2)[3], 16), '04b'), 2)
+				hexcode = format(immediate, '04x').upper()
+
+				if (binascii.unhexlify(hexcode))[0] == '1':
+					wb = str("FFFFFFFFFFFF" + hexcode)
+				else:
+					wb = str('000000000000' + hexcode)
+				reg = 'R' + str(lastProg.dest)
+				print(wb)
+			elif lastProg.cmd == 'XORI':
+				immediate = format(int(str(lastProg.src2)[0], 16), '04b') + format(int(str(lastProg.src2)[1], 16), '04b') + format(int(str(lastProg.src2)[2], 16), '04b') + format(int(str(lastProg.src2)[3], 16), '04b')
+				val = format(int(Register.objects.get(id=int(lastProg.src1)).value, 16), '016b')
+				binary = ''
+				for count in range(len(immediate)):
+					if immediate[count] != val[count]:
+						binary += '1'
+					else:
+						binary += '0'
+
+				reg = 'R' + str(lastProg.dest)
+				wb = format(int(binary, 2), '016x').upper()
+				print(wb)
+			elif lastProg.cmd == 'DADDU':
+				operation = int(Register.objects.get(id=int(lastProg.src1)).value, 16) + int(Register.objects.get(id=int(lastProg.src2)).value, 16)
+				reg = 'R' + str(lastProg.dest)
+				wb = format(operation, '016x')
+				print(wb)
+			elif lastProg.cmd == 'SLT':
+				operation = int(Register.objects.get(id=int(lastProg.src1)).value, 16) < int(Register.objects.get(id=int(lastProg.src2)).value, 16)
+				if operation:
+					wb = format(int(Register.objects.get(id=int(lastProg.src1)).value, 16), '016x')
+					reg = 'R' + str(lastProg.dest)
+				else:
+					wb = ''
+					reg = ''
+
+			for program in progObjects:
+				if program.cmd == 'LD':
+					address = format(int(int(program.src1, 16) + int(int(Register.objects.get(id=int(program.src2)).value, 16)/8)*8), '04x')
+					wback = DataSegment.objects.get(addr=address).value
+					regObj = Register.objects.get(id=int(program.dest))
+					regObj.value = wback
+					regObj.save()
+				elif program.cmd == 'SD':
+					address = format(int(int(program.dest, 16) + int(int(Register.objects.get(id=int(program.src2)).value, 16)/8)*8), '04x')
+					print(address)
+					wback = Register.objects.get(id=int(program.src1)).value
+					memObj = DataSegment.objects.get(addr=str(address))
+					memObj.value = wback
+					memObj.save()
+
+				elif program.cmd == 'BEQC' or program.cmd == 'J':
+					wback = 'N/A'
+				elif program.cmd == 'DADDIU':
+					immediate = int(Register.objects.get(id=int(program.src1)).value, 16) + int(format(int(str(program.src2)[0], 16), '04b') + format(int(str(program.src2)[1], 16), '04b') + format(int(str(program.src2)[2], 16), '04b') + format(int(str(program.src2)[3], 16), '04b'), 2)
+					hexcode = format(immediate, '04x').upper()
+					print("DADDIU")
+					if (binascii.unhexlify(hexcode))[0] == '1':
+						wback = str("FFFFFFFFFFFF" + hexcode)
+					else:
+						wback = str('000000000000' + hexcode)
+					regObj = Register.objects.get(id=int(program.dest))
+					regObj.value = wback
+					regObj.save()
+				elif program.cmd == 'XORI':
+					immediate = str(format(int(str(program.src2)[0], 16), '04b') + format(int(str(program.src2)[1], 16), '04b') + format(int(str(program.src2)[2], 16), '04b') + format(int(str(program.src2)[3], 16), '04b'))
+					val = str(format(int(Register.objects.get(id=int(program.src1)).value), '016b'))
+					print(immediate)
+					print(val)
+					binary = ''
+					for count in range(len(immediate)):
+						if immediate[count] != val[count]:
+							binary += '1'
+						else:
+							binary += '0'
+					wback = format(int(binary, 2), '016x').upper()
+					print(binary)
+					regObj = Register.objects.get(id=int(program.dest))
+					regObj.value = wback
+					regObj.save()
+				elif program.cmd == 'DADDU':
+					operation = int(Register.objects.get(id=int(program.src1)).value, 16) + int(Register.objects.get(id=int(program.src2)).value, 16)
+					wback = format(operation, '016x')
+					print("DADDU")
+					regObj = Register.objects.get(id=int(program.dest))
+					regObj.value = wback
+					regObj.save()
+
+				elif program.cmd == 'SLT':
+					operation = int(Register.objects.get(id=int(program.src1)).value, 16) < int(Register.objects.get(id=int(program.src2)).value, 16)
+					if operation:
+						wback = format(int(Register.objects.get(id=int(program.src1)).value, 16), '016x')
+						regObj = Register.objects.get(id=int(program.dest))
+						regObj.value = wback
+						regObj.save()
 
 			progObjects = MipsProgram.objects.all()
 			lengthOfLast = 0
@@ -193,37 +302,17 @@ def index(request):
 							temp.append('MEM')
 							temp.append('WB')
 							pipeline.append(temp)
-							print(temp)
 							if foundj and allocate > 0:
 								allocate -= 1
 							elif allocate == 0:
 								foundj = False
 								lastCmd = i
 								jtrigger = True
-				print(pipeline)
 				lengthOfLast = len(temp)
 
-			progObjects = MipsProgram.objects.all()
-# START OF INTERNAL REGISTER
-			for i in range(progObjects.count()):
-				if i == 0:
-					if_idIr = MipsProgram.objects.get(id=i).opcode
-					if_idNpc = format(int(MipsProgram.objects.get(id=i).addr, 16) + 4, '04x')
-					binOpcode = format(int(MipsProgram.objects.get(id=i).opcode, 16), '032b')
-
-					id_exA = Register.objects.get(id=int(binOpcode[6:11], 2)).value
-					id_exB = Register.objects.get(id=int(binOpcode[11:16], 2)).value
-					id
-
-				else:
-					samp = 0
-
 			context = {
-				'if_idIr': if_idIr,
-				'if_idNpc': if_idNpc,
-				'id_exA': id_exA,
-				'id_exB': id_exB,
-				# 'id_exNpc': id_exNpc,
+				'reg': reg,
+				'wb': wb,
 				'progObjects': progObjects,
 				'objectCount': progObjects.count(),
 				'error': error,
